@@ -1,50 +1,67 @@
 # Heap-Based Priority Queue: Emergency Room Triage System
 
-## Problem Context
-In hospital emergency rooms, patients are treated based on severity — not arrival order.
-This system uses a **Max-Heap** to ensure the most critical patients are always treated first.
-
-## Project Structure
-```
-er_triage_system/
-├── heap.py               # Max-heap implementation (core data structure)
-├── patient.py            # Patient data structure
-├── simulation.py         # ER simulation logic
-├── dataset.py            # Dataset generator
-├── main.py               # Main execution file
-├── README.md             # Documentation
-├── patients.csv          # Generated dataset (after running)
-└── treatment_report.csv  # Simulation results (after running)
-```
-
 ## How to Run
 
 ### Requirements
-- Python 3.7+
-- No external libraries required
+- Python 3.7 or higher
+- No external libraries needed
 
-### Run the full project
+### Steps
 ```bash
 cd er_triage_system
 python main.py
 ```
 
-### Run individual modules
+That's it. Two output files will be created:
+- `patients.csv` — 1,000 synthetic patients dataset
+- `treatment_report.csv` — full treatment order log
+
+To view the visual dashboard:
 ```bash
-python dataset.py       # Generate patients.csv only
-python simulation.py    # Requires patients.csv
+python serve.py
+```
+Then open `http://localhost:8080/dashboard.html` in your browser.
+
+---
+
+## Project Structure
+```
+er_triage_system/
+├── heap.py               # Max-heap with all required operations
+├── patient.py            # Patient data structure
+├── simulation.py         # 24-hour ER simulation logic
+├── dataset.py            # Dataset generator (1,000 patients → CSV)
+├── main.py               # Main execution file
+├── dashboard.html        # Visual browser dashboard
+├── serve.py              # Local server for dashboard
+├── README.md             # This file
+├── patients.csv          # Generated after running main.py
+└── treatment_report.csv  # Simulation results after running main.py
 ```
 
-## Algorithm Summary
+---
 
-| Operation          | Complexity  | Description                        |
-|--------------------|-------------|------------------------------------|
-| insert()           | O(log n)    | Add patient, bubble up             |
-| extract_max()      | O(log n)    | Remove most critical, heapify down |
-| increase_priority()| O(n + log n)| Find + bubble up                   |
-| build_max_heap()   | O(n)        | Build from unsorted array          |
-| is_empty()         | O(1)        | Check size                         |
-| Space              | O(n)        | Fixed-size array                   |
+## Heap Operations Implemented
+
+| Operation              | Signature                                      | Complexity   |
+|------------------------|------------------------------------------------|--------------|
+| `insert()`             | `insert(patientID, priority, time, condition)` | O(log n)     |
+| `extractMax()`         | `extractMax()`                                 | O(log n)     |
+| `increasePriority()`   | `increasePriority(patientID, newPriority)`     | O(n + log n) |
+| `isEmpty()`            | `isEmpty()`                                    | O(1)         |
+| `maxHeapify()`         | `maxHeapify(i)`                                | O(log n)     |
+| `buildMaxHeap()`       | `buildMaxHeap(patients)`                       | O(n)         |
+
+---
+
+## Heap Indexing (Zero-Based)
+```
+Parent(i)      = (i - 1) // 2
+LeftChild(i)   = 2 * i + 1
+RightChild(i)  = 2 * i + 2
+```
+
+---
 
 ## Priority Scale
 | Priority | Condition            |
@@ -60,14 +77,18 @@ python simulation.py    # Requires patients.csv
 | 2        | Minor Laceration     |
 | 1        | Common Cold          |
 
-## Dataset
-- 1,000 synthetic patients generated with `random` (seed=42)
-- Arrivals spread across a 24-hour window
-- Saved to `patients.csv`
+---
 
-## Output
-- `patients.csv` — Full patient dataset
-- `treatment_report.csv` — Treatment order with timestamps
+## Complexity Summary
+| Operation       | Time       | Proof                          |
+|-----------------|------------|--------------------------------|
+| insert          | O(log n)   | Bubble-up ≤ tree height        |
+| extractMax      | O(log n)   | maxHeapify ≤ tree height       |
+| buildMaxHeap    | O(n)       | Σ(n/2^h × h) = O(n)           |
+| Space           | O(n)       | Fixed-size array + O(log n) stack |
+
+---
 
 ## Dataset Source
-Self-generated using Python's built-in `random` module (seed=42 for reproducibility).
+Self-generated using Python `random` module (seed=42 for reproducibility).
+1,000 patients with unique IDs, priorities 1–10, and random arrival times across 24 hours.
